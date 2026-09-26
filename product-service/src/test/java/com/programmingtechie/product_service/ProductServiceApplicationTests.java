@@ -10,4 +10,6 @@ class ProductServiceApplicationTests {
 	void contextLoads() {
 	}
 
+	// testing the ProductService class
+
 }
