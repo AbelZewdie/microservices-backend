@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: product-service #Product Service Route
+              uri: lb://product-service
+              predicates:
+                - Path=/api/product
+            - id: order-service #Order Service Route
+              uri: lb://order-service
+              predicates:
+                - Path=/api/order
+            - id: discovery-server #Discover Server Route
+              uri: http://localhost:8761
+              predicates:
+                - Path=/eureka/web
+              filters:
+                - SetPath=/
+            - id: discovery-server-static #Discover Server Static Resources Route
+              uri: http://localhost:8761
+              predicates:
+                - Path=/eureka/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.server.mvc: TRACE
