@@ -1,0 +1,18 @@
+meta {
+  name: Add New Inventory
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8082/api/inventory
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "skuCode": "iphone_15",
+    "quantity": 100
+  }
+}

@@ -1,0 +1,11 @@
+meta {
+  name: Check Stock By SKU
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8082/api/inventory?skuCode=iphone_13&skuCode=iphone_15
+  body: none
+  auth: none
+}
