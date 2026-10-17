@@ -13,6 +13,5 @@ import lombok.NoArgsConstructor;
 public class InventoryResponse {
     private String skuCode;
 
-    @JsonProperty("isInStock")
-    private boolean isInStock;
+    private Boolean isInStock;
 }

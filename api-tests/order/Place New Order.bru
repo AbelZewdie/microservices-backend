@@ -1,0 +1,29 @@
+meta {
+  name: Place New Order
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/api/order
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "orderLineItemsDtoList":[
+      {
+        "skuCode": "iphone_13",
+        "price": 1200,
+        "quantity": 1
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}
