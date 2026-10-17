@@ -1,0 +1,25 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/product
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Keychron K2 HE",
+    "description": "Wireless mechanical keyboard with magnetic switches",
+    "price": 130
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

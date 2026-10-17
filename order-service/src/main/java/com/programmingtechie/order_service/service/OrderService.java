@@ -3,6 +3,7 @@ package com.programmingtechie.order_service.service;
 import com.programmingtechie.order_service.dto.InventoryResponse;
 import com.programmingtechie.order_service.dto.OrderLineItemsDto;
 import com.programmingtechie.order_service.dto.OrderRequest;
+import com.programmingtechie.order_service.dto.OrderResponse;
 import com.programmingtechie.order_service.model.Order;
 import com.programmingtechie.order_service.model.OrderLineItems;
 import com.programmingtechie.order_service.repository.OrderRepository;
@@ -54,8 +55,37 @@ public class OrderService {
         } else {
             throw new IllegalArgumentException("Product is not in stock, please try again later.");
         }
+        // Removed the duplicate orderRepository.save(order); from here
+    }
 
-        orderRepository.save(order);
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
+
+    private OrderResponse mapToOrderResponse(Order order) {
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setId(order.getId());
+        orderResponse.setOrderNumber(order.getOrderNumber());
+
+        List<OrderLineItemsDto> orderLineItemsDtoList = order.getOrderLineItemsList()
+                .stream()
+                .map(this::mapToDtoResponse)
+                .toList();
+
+        orderResponse.setOrderLineItemsDtoList(orderLineItemsDtoList);
+        return orderResponse;
+    }
+
+    private OrderLineItemsDto mapToDtoResponse(OrderLineItems orderLineItems) {
+        OrderLineItemsDto dto = new OrderLineItemsDto();
+        dto.setId(orderLineItems.getId());
+        dto.setPrice(orderLineItems.getPrice());
+        dto.setQuantity(orderLineItems.getQuantity());
+        dto.setSkuCode(orderLineItems.getSkuCode());
+        return dto;
     }
 
     private OrderLineItems mapToDto(OrderLineItemsDto orderLineItemDto) {
