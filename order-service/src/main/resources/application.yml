@@ -19,7 +19,7 @@ server:
   port: 8081
 management:
   health:
-    circuitbreaker:
+    circuitbreakers:
       enabled: true
   endpoints:
     web:
@@ -28,15 +28,15 @@ management:
   endpoint:
     health:
       show-details: always
-resilience4j: #Resilience4j configuration for circuit breaker
-  circuitbreaker:
+resilience4j:
+  circuitbreaker: #Resilience4j configuration for circuit breaker
     instances:
       inventory:
-        registerHealthIndicator: true
+        register-health-indicator: true
         event-consumer-buffer-size: 10
-        slidingWindowType: COUNT_BASED
-        slidingWindowSize: 5
-        failureRateThreshold: 50
-        waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 3
-        automaticTransitionFromOpenToHalfOpenEnabled: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
