@@ -9,6 +9,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  zipkin:
+    base-url: http://localhost:9411
+    enabled: true
+  slueth:
+    sampler:
+      probability: 1.0
 eureka:
   client:
     serviceUrl:
@@ -28,6 +34,12 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: "http://localhost:9411/api/v2/spans"
 resilience4j:
   circuitbreaker: #Resilience4j configuration for circuit breaker
     instances:
@@ -49,3 +61,6 @@ resilience4j:
       inventory:
         max-attempts: 3
         wait-duration: 5s
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
