@@ -8,6 +8,7 @@ import com.programmingtechie.order_service.model.Order;
 import com.programmingtechie.order_service.model.OrderLineItems;
 import com.programmingtechie.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,13 +17,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final WebClient.Builder webClientBuilder;
+    // 1. Inject the WebClient singleton directly, NOT the builder
+    private final WebClient webClient;
 
     public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
@@ -39,8 +42,8 @@ public class OrderService {
                 .map(OrderLineItems::getSkuCode)
                 .toList();
 
-        // Call Inventory Service, and place order if product is in stock.
-        InventoryResponse[] inventoryResponsArray = webClientBuilder.build().get()
+        // 2. Call the API directly using the pre-built singleton
+        InventoryResponse[] inventoryResponsArray = webClient.get()
                 .uri("http://inventory-service/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
                 .retrieve()
@@ -65,6 +68,7 @@ public class OrderService {
 
     public List<OrderResponse> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
+        log.info("Fetching all orders...");
         return orders.stream()
                 .map(this::mapToOrderResponse)
                 .toList();
