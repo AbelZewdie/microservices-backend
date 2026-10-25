@@ -7,34 +7,41 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
+    private final Executor taskExecutor; // <-- Inject Spring's managed thread pool
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
     @TimeLimiter(name = "inventory")
     @Retry(name = "inventory")
-    public CompletableFuture<String> placeOrder(@RequestBody OrderRequest orderRequest) {
-        return CompletableFuture.supplyAsync(() -> orderService.placeOrder(orderRequest));
+    public CompletableFuture<ResponseEntity<String>> placeOrder(@RequestBody OrderRequest orderRequest) {
+        return CompletableFuture.supplyAsync(() ->
+                ResponseEntity.status(HttpStatus.CREATED)
+                        .body(orderService.placeOrder(orderRequest)), taskExecutor);
     }
 
-    public CompletableFuture<String> fallbackMethod(OrderRequest orderRequest, RuntimeException runtimeException){
-        return CompletableFuture.supplyAsync(() -> "Oops! Something went wrong, please order after some time!");
+    public CompletableFuture<ResponseEntity<String>> fallbackMethod(OrderRequest orderRequest, Throwable throwable) {
+        return CompletableFuture.supplyAsync(() ->
+                ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("Oops! Something went wrong, please order after some time!"), taskExecutor);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrders();
     }
